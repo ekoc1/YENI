@@ -2,13 +2,11 @@
 <html>
   <head>
     <title>AR Marker + GLB Model</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js@1.7.7/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js@1.7.5/aframe/build/aframe-ar.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-
-      <!-- Marker dosyası doğrudan dizinde -->
       <a-marker type="pattern" url="deneme.patt" id="marker">
         <a-entity id="model" 
                   visible="false" 
@@ -26,40 +24,15 @@
       const marker = document.querySelector('#marker');
       const model = document.querySelector('#model');
 
-      let lastMatrixWorld = null;
-      let modelPlaced = false;
-
       marker.addEventListener('markerFound', () => {
         console.log('Marker bulundu');
         model.setAttribute('visible', true);
-
-        const markerObject3D = marker.object3D;
-        model.object3D.position.copy(markerObject3D.position);
-        model.object3D.rotation.copy(markerObject3D.rotation);
-        model.object3D.updateMatrixWorld();
-
-        lastMatrixWorld = model.object3D.matrixWorld.clone();
-        modelPlaced = true;
       });
 
       marker.addEventListener('markerLost', () => {
         console.log('Marker kayboldu');
-        if (modelPlaced) {
-          model.setAttribute('visible', true);
-          model.object3D.matrix.copy(lastMatrixWorld);
-          model.object3D.matrix.decompose(model.object3D.position, model.object3D.quaternion, model.object3D.scale);
-        }
+        model.setAttribute('visible', false);
       });
-
-      AFRAME.registerComponent('keep-model-position', {
-        tick: function () {
-          if (!marker.object3D.visible && modelPlaced) {
-            // Model sabit kalır
-          }
-        }
-      });
-
-      model.setAttribute('keep-model-position', '');
     </script>
   </body>
 </html>
